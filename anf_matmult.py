@@ -13,7 +13,7 @@ def check_mult(var_manager, inputA, inputB, output, n):
             print(string)
     return 0
 
-def node_variable_initializer(variable_manager, node_type, number, offset):
+def node_var_initializer(variable_manager, node_type, number, offset):
     variable_manager[node_type] = ["x"+str(i) for i in range(offset, offset+number)]
     return variable_manager, offset+number
 
@@ -29,16 +29,19 @@ def sigma_connect(variable_manager, in_layer, out_layer,  offset):
     return variable_manager, offset
 
 def pi_connect(variable_manager, in_layer, out_layer, fanin, offset):
-
-    in_layer = variable_manager[in_layer[0]] +  variable_manager[in_layer[1]]
-
-    #for node_out in variable_manager[out_layer]:
-    #    connection = node_out + " + "
-    #    for node_in in variable_manager[in_layer]:
-    #        connection += node_in + 
-
-    number = 0
-    return variable_manager, offset+number
+    for node_out in variable_manager[out_layer]:
+        switches = []
+        for node_A in variable_manager[in_layer[0]]:
+            for node_B in variable_manager[in_layer[1]]:
+                switches.append(offset)
+                print( node_A + "*" + node_B + "*x" + str(offset) + " + " + node_out + "*x" + str(offset) + " + 1") 
+                offset+=1
+        for switch_1 in switches:
+            for switch_2 in switches:
+                if switch_1 != switch_2:
+                    print("x"+str(switch_1) + "*x" + str(switch_2) + " + 1")
+    # enforce atmost 2 fan-in condition by banning 2 incoming wires from same matrix.
+    return variable_manager, offset
 
 
 def main():
@@ -60,12 +63,12 @@ def main():
     var_manager = {}  # a dict to keep track of variables
     offset  = 1
 
-    var_manager, offset = node_variable_initializer(var_manager, 'matA', n**2, offset)
-    var_manager, offset = node_variable_initializer(var_manager, 'matB', n**2, offset)
-    var_manager, offset = node_variable_initializer(var_manager, 'input_sigmaA', n**2, offset)
-    var_manager, offset = node_variable_initializer(var_manager, 'input_sigmaB', n**2, offset)
-    var_manager, offset = node_variable_initializer(var_manager, 'middle_pi', num_pi_nodes, offset)
-    var_manager, offset = node_variable_initializer(var_manager, 'output_sigma', n**2, offset)
+    var_manager, offset = node_var_initializer(var_manager, 'matA', n**2, offset)
+    var_manager, offset = node_var_initializer(var_manager, 'matB', n**2, offset)
+    var_manager, offset = node_var_initializer(var_manager, 'input_sigmaA', n**2, offset)
+    var_manager, offset = node_var_initializer(var_manager, 'input_sigmaB', n**2, offset)
+    var_manager, offset = node_var_initializer(var_manager, 'middle_pi', num_pi_nodes, offset)
+    var_manager, offset = node_var_initializer(var_manager, 'output_sigma', n**2, offset)
 
     var_manager, offset = sigma_connect(var_manager, 'matA', 'input_sigmaA', offset)
     var_manager, offset = sigma_connect(var_manager, 'matB', 'input_sigmaB', offset)
@@ -74,7 +77,7 @@ def main():
 
     check_mult(var_manager, 'matA', 'matB', 'output_sigma', n)
     
-    print(var_manager)
+    #print(var_manager)
 
 if __name__== "__main__":
     main()
