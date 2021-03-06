@@ -8,11 +8,20 @@ def node_var_initializer(variable_manager, node_type, number, offset):
 def sigma_connect(variable_manager, in_layer, out_layer,  offset):
     for node_out in variable_manager[out_layer]:
         connection = node_out + " + "
+        fanin = []
         for node_in in variable_manager[in_layer]:
             connection += node_in + "*x" + str(offset) + " + "
+            fanin.append(offset)
             offset += 1
- 
+        
+        fanin_constraint = "1 + "
+        for i in range(len(fanin)):
+            fanin_constraint += "x" + str(fanin[i]) + " + "
+            for j in range(i,len(fanin)):
+                fanin_constraint += "x" + str(fanin[j]) + "*x" + str(fanin[i]) + " + "
+
         print(connection[:-3])
+        print(fanin_constraint[:-3])
  
     return variable_manager, offset
 
@@ -101,7 +110,7 @@ def main():
 
     generate_random_mat(var_manager, 'matA', 'matB', 'output_sigma', n) 
     
-    #print("c "+ str(var_manager))
+    print("c "+ str(var_manager))
 
 if __name__== "__main__":
     main()
