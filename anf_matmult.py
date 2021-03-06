@@ -34,7 +34,7 @@ def pi_connect(variable_manager, in_layer, out_layer, fanin, offset):
                 print( node_A + "*" + node_B + "*x" + str(offset) + " + " + node_out + "*x" + str(offset)) 
                 offset+=1
         
-        # fanin maximum 2 for each and node
+        # fanin maximum 2 for each and node, suspiciious`
         for switch_1 in switches:
             for switch_2 in switches:
                 if switch_1 != switch_2:
